@@ -1,0 +1,10 @@
+{
+  "name": "deductcheck-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serverless endpoint that emails the client's DeductCheck report and evidence pack, bcc's the practice inbox, and confirms receipt in the same email.",
+  "engines": {
+    "node": ">=18"
+  },
+  "type": "module"
+}
