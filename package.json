@@ -1,0 +1,13 @@
+{
+  "name": "deductcheck-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serverless endpoints for DeductCheck: emails the client's report and evidence pack, and verifies Stripe payment before the report unlocks.",
+  "engines": {
+    "node": ">=18"
+  },
+  "type": "module",
+  "dependencies": {
+    "stripe": "^17.0.0"
+  }
+}
