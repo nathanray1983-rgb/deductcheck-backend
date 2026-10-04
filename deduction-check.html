@@ -201,6 +201,8 @@ input[type=text],input[type=search],input[type=date]{font-size:18px}
 .src{color:var(--ink-2)}
 .attach{margin-top:4px}
 .fp{margin-top:6px;font-size:13px;color:var(--gum)} .fp span{color:var(--ink-2)}
+.fprow{display:inline-block;margin:2px 0}
+.fpremove{margin-left:8px;font-size:12px;color:var(--cut)}
 .todo li b{display:block}
 .dgroup{margin:26px 0 8px}
 .dhead{display:flex;align-items:baseline;gap:10px;font-size:18px;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
@@ -354,7 +356,7 @@ input[type=text],input[type=search],input[type=date]{font-size:18px}
       <p>They're cleared automatically the moment you successfully submit. To start over before that, use "Clear my answers" below.</p>
     </div></details>
     <details class="faq"><summary>I attached the wrong photo to a question &mdash; how do I remove it?</summary><div class="a">
-      <p>There's no way to remove a single attached file yet &mdash; the simplest fix right now is "Clear my answers" and redo that section. We know that's clunky for one wrong file; it's on the list to fix.</p>
+      <p>Click "Remove" next to that file in the list under the question &mdash; it comes off this claim straight away, and you can attach the right one instead. You don't need to clear your whole form for one wrong file.</p>
     </div></details>
     <details class="faq"><summary>Where do my photos and documents go?</summary><div class="a">
       <p>They stay on your device the whole time. We only ever keep a digital fingerprint of each file, not the file itself &mdash; the real files go into the evidence pack you download, and nowhere else.</p>
@@ -1833,7 +1835,7 @@ function wireDoneCard(){
   };
 }
 function updateDoneCard(){ const w=document.getElementById("doneWrap"); if(!w) return; w.innerHTML=doneCardHTML(); wireDoneCard(); }
-function fpList(key){ const f=FILES[key]||[]; return f.map(x=>`✓ ${esc(x.file.name)} <span>(fingerprint ${x.hash.slice(0,10)}…)</span>`).join("<br>"); }
+function fpList(key){ const f=FILES[key]||[]; return f.map(x=>`<span class="fprow">✓ ${esc(x.file.name)} <span>(fingerprint ${x.hash.slice(0,10)}…)</span> <button type="button" class="linkbtn fpremove no-print" data-rmfile="${key}" data-rmhash="${x.hash}" aria-label="Remove ${esc(x.file.name)}">Remove</button></span>`).join("<br>"); }
 async function sha256(file){ const buf=await file.arrayBuffer(); const h=await crypto.subtle.digest("SHA-256",buf); return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,"0")).join(""); }
 function updateEvidenceGate(){
   const R=S.result; if(!R) return;
@@ -1865,6 +1867,22 @@ function reportAfter(){
   root.querySelectorAll("[data-attach]").forEach(inpEl=>inpEl.addEventListener("change", async ()=>{ const key=inpEl.dataset.attach; FILES[key]=FILES[key]||[];
     for(const f of inpEl.files){ const hash=await sha256(f); if(FILES[key].some(x=>x.hash===hash)) continue; FILES[key].push({file:f,hash}); IDB.put({id:S.sid+":"+key+":"+hash,key,hash,name:f.name,type:f.type,blob:f,sid:S.sid}); (S.fps[key]=S.fps[key]||[]).push({name:f.name,size:f.size,sha256:hash,added:new Date().toISOString()}); }
     save(); root.querySelector(`[data-fplist="${key}"]`).innerHTML=fpList(key); updateEvidenceGate(); }));
+  /* Per-file remove. Delegated on root (not the file list itself, which gets replaced via
+     innerHTML above and on every attach/remove) so this survives those refreshes without
+     stacking duplicate listeners — root.onclick assignment, not addEventListener, since
+     render() reuses the same #q node across repeated visits to this step. */
+  root.onclick = e => {
+    const btn = e.target.closest("[data-rmfile]"); if(!btn) return;
+    const key = btn.dataset.rmfile, hash = btn.dataset.rmhash;
+    const rec = (FILES[key]||[]).find(x=>x.hash===hash);
+    if(!confirm(`Remove "${rec?rec.file.name:"this file"}" from your evidence for this claim? This can't be undone.`)) return;
+    FILES[key] = (FILES[key]||[]).filter(x=>x.hash!==hash);
+    S.fps[key] = (S.fps[key]||[]).filter(x=>x.sha256!==hash);
+    IDB.deleteMany([S.sid+":"+key+":"+hash]);
+    save();
+    const list = root.querySelector(`[data-fplist="${key}"]`); if(list) list.innerHTML = fpList(key);
+    updateEvidenceGate();
+  };
   const ack=$("#ack"); if(ack) ack.onchange=()=>{
     S.ack=ack.checked?new Date().toISOString():null; save();
     const note=$("#ackNote"); if(note) note.textContent = S.ack?`Recorded ${new Date(S.ack).toLocaleString("en-AU")}.`:"";
