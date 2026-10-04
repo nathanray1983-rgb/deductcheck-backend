@@ -81,6 +81,15 @@ p{margin:0 0 14px}
 .price{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-l);padding:26px;max-width:520px}
 .price .amt{font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1}
 .price ul{padding-left:20px}
+.faqgroup{margin:0 0 36px}
+.faq{border:1px solid var(--line);border-radius:var(--radius-s);background:var(--paper);margin:0 0 8px;overflow:hidden}
+.faq summary{padding:14px 16px;font-weight:600;cursor:pointer;list-style:none;display:flex;gap:10px;align-items:baseline}
+.faq summary::before{content:"+";color:var(--gum);font-weight:800;flex:none;width:1em}
+.faq[open] summary::before{content:"\2212"}
+.faq summary::-webkit-details-marker{display:none}
+.faq .a{padding:0 16px 16px 42px;color:var(--ink-2)}
+.faq .a p{margin:0 0 10px}
+.faq .a p:last-child{margin-bottom:0}
 footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:14px;color:var(--ink-2)}
 footer a{margin-right:14px}
 /* Questionnaire */
@@ -228,6 +237,7 @@ input[type=text],input[type=search],input[type=date]{font-size:18px}
   <nav class="links">
     <a href="#how">How it works</a>
     <a href="#pricing">Pricing</a>
+    <a href="#help">Help</a>
     <a class="btn small" href="#start">Start free check</a>
   </nav>
 </div></header>
@@ -316,6 +326,84 @@ input[type=text],input[type=search],input[type=date]{font-size:18px}
       <p class="hint" style="margin:10px 0 0">This device's answers and files have been cleared — there's nothing left to do here.</p>
       <p style="margin:16px 0 0"><a class="btn" href="#start">Start a new check</a> &nbsp; <a class="linkbtn" href="#home">Back to home</a></p>
     </div>
+  </div>
+</div></section>
+
+<!-- HELP -->
+<section class="page" id="p-help"><div class="wrap prose">
+  <h1>Help &amp; FAQ</h1>
+  <p class="hint">Most questions are answered below. If yours isn&rsquo;t, email <a href="mailto:support@clearlinetax.com.au">support@clearlinetax.com.au</a> and we&rsquo;ll get back to you.</p>
+
+  <h3>Getting started</h3>
+  <div class="faqgroup">
+    <details class="faq"><summary>Do I need my myGov login, TFN or bank details?</summary><div class="a">
+      <p>No. DeductCheck never asks for your tax file number, bank details or myGov login &mdash; see the <a href="#privacy">Privacy Policy</a> for exactly what we do collect.</p>
+    </div></details>
+    <details class="faq"><summary>What's the difference between the free check and the full report?</summary><div class="a">
+      <p>The free check gives a rough yes/no on whether itemising is likely worth it, based on a single ballpark figure you enter. The full report works out every claim against the actual rules, builds your evidence checklist and pack, and &mdash; if you self-lodge &mdash; gives step-by-step myGov guidance.</p>
+    </div></details>
+    <details class="faq"><summary>Do I need a tax agent to use this?</summary><div class="a">
+      <p>No. Tell it you self-lodge and you'll get the report plus myGov guidance to enter the figures yourself. If you'd rather hand it to someone, you can send a copy to your own tax agent, or ask Clearline to take it over &mdash; see "After you submit" below.</p>
+    </div></details>
+  </div>
+
+  <h3>Your answers and evidence</h3>
+  <div class="faqgroup">
+    <details class="faq"><summary>Why does the form remember my answers from last time?</summary><div class="a">
+      <p>Your answers save automatically in your browser as you go, so you can close the tab and pick up where you left off &mdash; on the <i>same device and browser</i> only, nothing syncs across devices or accounts.</p>
+      <p>They're cleared automatically the moment you successfully submit. To start over before that, use "Clear my answers" below.</p>
+    </div></details>
+    <details class="faq"><summary>I attached the wrong photo to a question &mdash; how do I remove it?</summary><div class="a">
+      <p>There's no way to remove a single attached file yet &mdash; the simplest fix right now is "Clear my answers" and redo that section. We know that's clunky for one wrong file; it's on the list to fix.</p>
+    </div></details>
+    <details class="faq"><summary>Where do my photos and documents go?</summary><div class="a">
+      <p>They stay on your device the whole time. We only ever keep a digital fingerprint of each file, not the file itself &mdash; the real files go into the evidence pack you download, and nowhere else.</p>
+    </div></details>
+    <details class="faq"><summary>Is my data safe?</summary><div class="a">
+      <p>See the <a href="#privacy">Privacy Policy</a> for the full picture &mdash; what's collected, why, and how long it's kept (five years from lodgement, matching ATO record-keeping rules).</p>
+    </div></details>
+  </div>
+
+  <h3>Deductions and records</h3>
+  <div class="faqgroup">
+    <details class="faq"><summary>I don't have a 12-week logbook for my car &mdash; what happens?</summary><div class="a">
+      <p>Without a valid logbook (your own from any of the last 5 years counts), your car claim is worked out on cents per km instead, capped at 5,000 work km a year. A logbook usually supports a bigger claim if your work use is high.</p>
+    </div></details>
+    <details class="faq"><summary>Why is my working-from-home claim $0?</summary><div class="a">
+      <p>The fixed-rate method needs a record of your actual hours for the whole year &mdash; a timesheet, roster or diary. A rough guess with nothing behind it isn't accepted, so it shows as unsupported until you have that record. Start one from today even if you can't back-fill the rest of the year.</p>
+    </div></details>
+    <details class="faq"><summary>Why is my phone and internet claim $0 when I also claimed working from home?</summary><div class="a">
+      <p>The working-from-home fixed rate already bundles in phone and internet (along with power and other running costs), so claiming both separately would be double-dipping. If you'd rather claim phone/internet by itself, don't tick working from home &mdash; whichever gives the better outcome depends on your actual usage.</p>
+    </div></details>
+    <details class="faq"><summary>An item shows "no match" for how long it lasts &mdash; what does that mean?</summary><div class="a">
+      <p>It means nothing in the ATO's effective life tables matched what you described. You can pick a close match yourself, or let it default to a 5-year estimate &mdash; either way it's flagged so we double-check the real figure before lodging.</p>
+    </div></details>
+    <details class="faq"><summary>My self-education fees were paid with HECS-HELP or FEE-HELP &mdash; can I still claim them?</summary><div class="a">
+      <p>No &mdash; fees paid through a HELP loan aren't deductible, only amounts you actually paid yourself. Check your HELP statement or the course invoice if you're not sure which applies.</p>
+    </div></details>
+  </div>
+
+  <h3>Payment and your report</h3>
+  <div class="faqgroup">
+    <details class="faq"><summary>What does the report fee cover?</summary><div class="a">
+      <p>Every claim worked out against the rules, an evidence checklist and pack, and &mdash; if you self-lodge &mdash; a step-by-step myGov guide. It's a one-off charge per income year, and it's itself deductible next year as a cost of managing your tax affairs.</p>
+    </div></details>
+    <details class="faq"><summary>I paid but something went wrong</summary><div class="a">
+      <p>Email <a href="mailto:support@clearlinetax.com.au">support@clearlinetax.com.au</a> with what happened &mdash; because answers aren't stored on our servers, it helps if you can describe what you entered.</p>
+    </div></details>
+  </div>
+
+  <h3>After you submit</h3>
+  <div class="faqgroup">
+    <details class="faq"><summary>What happens when I submit?</summary><div class="a">
+      <p>You're emailed your PDF report. This device's saved answers are cleared straight after &mdash; so download your evidence pack from the site first if you haven't already; the emailed copy of your evidence pack is size-reduced to fit in an email, while the one you download from the site keeps your original files.</p>
+    </div></details>
+    <details class="faq"><summary>I didn't get the email</summary><div class="a">
+      <p>Check spam/junk first. Still nothing after 15 minutes? Email <a href="mailto:support@clearlinetax.com.au">support@clearlinetax.com.au</a> and we'll resend it.</p>
+    </div></details>
+    <details class="faq"><summary>Can I still get Clearline to lodge it for me?</summary><div class="a">
+      <p>Yes &mdash; on the results page, tick "I'd like Clearline Tax &amp; Accounting to contact me" and select "Let Clearline take it from here." That's a request for us to be in touch, not an engagement yet &mdash; we'll complete identity verification and a Client Engagement Letter with you before acting as your registered tax agent.</p>
+    </div></details>
   </div>
 </div></section>
 
@@ -420,7 +508,7 @@ input[type=text],input[type=search],input[type=date]{font-size:18px}
 </main>
 
 <footer><div class="wrap">
-  <a href="#privacy">Privacy</a><a href="#terms">Terms</a><a href="#" id="clear-data">Clear my answers</a>
+  <a href="#help">Help</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a><a href="#" id="clear-data">Clear my answers</a>
   <p style="margin-top:10px">DeductCheck, a service of Clearline Tax & Accounting · Registered tax agent 25624306. General rules applied to your answers; not a substitute for advice on complex situations.</p>
 </div></footer>
 
@@ -1169,7 +1257,7 @@ const STEPS = [
       ${field("How did you work out the km?", radio("car_kmbasis",[["diary","Diary or app"],["roster","Roster"],["estimate","Estimate"]]), "", "car_kmbasis")}
     </div>
     <div id="logq" ${S.a.car_method==="logbook"?"":"hidden"}>
-      ${field("Do you have a valid 12-week logbook covering this year?", radio("car_logbook",[["yes","Yes"],["no","No"]]), "", "car_logbook")}
+      ${field("Do you have a valid 12-week logbook covering this year?", radio("car_logbook",[["yes","Yes"],["no","No"]]), "A logbook from any of the last 5 years still counts, as long as your work pattern hasn't changed much. No logbook means your claim is based on cents per km instead, capped at 5,000 km.", "car_logbook")}
       <h3>Running costs</h3>
       <p class="hint">Add each category you had. Leave any that don't apply blank.</p>
       <div class="pair">${field("Registration", inp("car_rego","money"),"", "car_rego")}${field("Insurance", inp("car_insurance","money"),"", "car_insurance")}</div>
@@ -1272,7 +1360,7 @@ const STEPS = [
      return null;
    }},
   {id:"clothing", cat:"clothing", title:"Clothing and laundry", render:()=>`
-    ${field("Which best describes the clothing?", radio("cl_type",[["uniform","A compulsory uniform with the employer's logo"],["noncomp","A non-compulsory uniform"],["protective","Protective gear (hi-vis, steel caps, gloves)"],["occupation","Specific to my job (chef's checks, nurse's scrubs)"],["conventional","Plain clothes my employer asks for (black pants, white shirt)"]]), "", "cl_type")}
+    ${field("Which best describes the clothing?", radio("cl_type",[["uniform","A compulsory uniform with the employer's logo"],["noncomp","A non-compulsory uniform"],["protective","Protective gear (hi-vis, steel caps, gloves)"],["occupation","Specific to my job (chef's checks, nurse's scrubs)"],["conventional","Plain clothes my employer asks for (black pants, white shirt)"]]), "Plain clothes aren't deductible even if your employer requires a certain colour or style — it has to be a uniform, protective gear, or clearly tied to your specific occupation.", "cl_type")}
     <div id="regq" ${S.a.cl_type==="noncomp"?"":"hidden"}>${field("Is the design registered with AusIndustry?", radio("cl_registered",[["yes","Yes"],["no","No or not sure"]]), "Your employer will know.", "cl_registered")}</div>
     ${field("Spent on this clothing", inp("cl_spent","money"),"Leave blank if you're only claiming laundry.", "cl_spent")}
     <h3>Laundry</h3>
@@ -1282,7 +1370,7 @@ const STEPS = [
    validate:a=>firstErr(req(!a.cl_type,"Choose the clothing type.","cl_type"), req(num(a.cl_loads)&&!a.cl_loadtype,"Say what was in the loads.","cl_loadtype"), req(!num(a.cl_spent)&&!num(a.cl_loads),"Enter what you spent or your laundry loads.","cl_spent"))},
   {id:"selfed", cat:"selfed", title:"Courses and study", render:()=>`
     ${field("How does the study relate to your job?", radio("se_link",[["current","It keeps or improves skills for my current job"],["income","It's likely to increase my income in my current job"],["newjob","It's for a new job or career"]]), "", "se_link")}
-    ${field("Were the fees paid with a HECS-HELP or FEE-HELP loan?", radio("se_help",[["no","No"],["yes","Yes"]]), "", "se_help")}
+    ${field("Were the fees paid with a HECS-HELP or FEE-HELP loan?", radio("se_help",[["no","No"],["yes","Yes"]]), "Fees paid through a HELP loan aren't deductible — only amounts you paid yourself. Check your HELP statement or course invoice if you're not sure.", "se_help")}
     <div class="grid2">${field("Course fees", inp("se_fees","money"),"", "se_fees")}${field("Books and materials", inp("se_books","money"),"", "se_books")}</div>
     <h3>Getting to and from study</h3>
     ${field("Did you drive your own car to any of this?", radio("se_drove",[["yes","Yes"],["no","No"]]), "", "se_drove")}
@@ -1292,7 +1380,7 @@ const STEPS = [
    validate:a=>firstErr(req(!a.se_link,"Choose how the study relates to your job.","se_link"), req(!a.se_help,"Answer the loan question.","se_help"), req(!a.se_drove,"Say whether you drove.","se_drove"), req(!(num(a.se_fees)||num(a.se_books)||num(a.se_travel_other)||num(a.se_travel_km)),"Enter at least one amount.","se_fees"))},
   {id:"wfh", cat:"wfh", title:"Working from home", intro:"This uses the ATO fixed rate, which already covers power, phone, internet and stationery.", render:()=>`
     ${field("Hours worked from home in "+RULES.year, inp("wfh_hours","count","400","hours"),"", "wfh_hours")}
-    ${field("Do you have a record of those hours for the whole year?", radio("wfh_records",[["yes","Yes, timesheets, a diary or roster"],["no","No, it's an estimate"]]), "", "wfh_records")}`,
+    ${field("Do you have a record of those hours for the whole year?", radio("wfh_records",[["yes","Yes, timesheets, a diary or roster"],["no","No, it's an estimate"]]), "A rough estimate with nothing behind it isn't accepted — if you don't have a full-year record yet, start one today; it can still support next year's claim.", "wfh_records")}`,
    validate:a=>firstErr(req(!num(a.wfh_hours),"Enter your hours.","wfh_hours"), req(!a.wfh_records,"Answer the records question.","wfh_records"))},
   {id:"phone", cat:"phone", title:"Phone and internet", render:()=>`
     ${(S.a.sel||[]).includes("wfh")?`<div class="note warn">You've also chosen working from home. Its fixed rate already covers phone and internet, so these won't add to your claim. Answer anyway so your report shows why.</div>`:""}
