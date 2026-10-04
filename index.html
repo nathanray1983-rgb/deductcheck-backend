@@ -1170,6 +1170,86 @@ function depMethodBoxHTML(prefix, opts){
 }
 function refreshDepBox(prefix, opts, boxSel){ const box=$(boxSel||"#depMethodBox"); if(box) box.innerHTML = depMethodBoxHTML(prefix, opts); }
 
+/* Carry-forward: lets a returning client (or Nathan, reviewing) bring a vehicle's depreciation
+   details across from last year's interaction-record.json instead of re-typing (and
+   re-remembering) the original purchase price/date/method every year. Entirely client-side —
+   the file is read with FileReader in the browser, never uploaded anywhere, so this has no
+   server component and needs no login or identity check: it's exactly the same trust level as
+   the client already attaching their own evidence files today. Deliberately scoped to vehicle
+   depreciation only (car D1 / D2 commercial vehicle) — see carryForwardBoxHTML/wireCarryForward. */
+function extractCarryForward(parsed, prefix){
+  if(!parsed || typeof parsed!=="object" || !parsed.answers || typeof parsed.answers!=="object"){
+    return {error:"That doesn't look like a DeductCheck file — it should be the interaction-record.json from last year's evidence pack."};
+  }
+  const a = parsed.answers;
+  if(a[prefix+"_dep_claim"]!=="yes"){
+    return {error:"No "+(prefix==="d2"?"commercial vehicle":"car")+" depreciation was claimed in that file, so there's nothing to carry forward here."};
+  }
+  const when = a[prefix+"_dep_when"];
+  const price = num(a[prefix+"_dep_price"]);
+  const method = a[prefix+"_dep_method"]==="prime" ? "prime" : "dv";
+  const origDate = when==="before" ? a[prefix+"_dep_orig_date"] : a[prefix+"_dep_date"];
+  if(!price || !origDate || isNaN(new Date(origDate))){
+    return {error:"That file doesn't have complete depreciation details to carry forward — enter them manually below."};
+  }
+  return {price, origDate, method, fromYear: parsed.year || "last year"};
+}
+function carryForwardBoxHTML(prefix){
+  return `<div class="card no-print" style="margin:10px 0" data-carryfwd="${prefix}">
+    <p class="hint" style="margin:0 0 8px"><b>Depreciating the same vehicle as last year?</b> Upload last year's file to bring across the purchase price, date and method instead of re-entering them.</p>
+    <label class="btn ghost small attach">Upload last year's file<input type="file" hidden accept=".json,application/json" data-carryfwd-file="${prefix}"></label>
+    <div data-carryfwd-status="${prefix}"></div>
+  </div>`;
+}
+function applyCarryForward(prefix, found){
+  const setRadio = (name,val)=>{ const el=document.querySelector(`[name="${name}"][value="${val}"]`); if(el) el.checked=true; };
+  const setVal = (id,val)=>{ const el=document.getElementById("f_"+id); if(el) el.value=val; };
+  S.a[prefix+"_dep_when"]="before";
+  S.a[prefix+"_dep_orig_date"]=found.origDate;
+  S.a[prefix+"_dep_claimed_before"]="yes";
+  S.a[prefix+"_dep_prior_method"]=found.method;
+  S.a[prefix+"_dep_price"]=String(found.price);
+  setRadio(prefix+"_dep_when","before");
+  setRadio(prefix+"_dep_claimed_before","yes");
+  setRadio(prefix+"_dep_prior_method",found.method);
+  setVal(prefix+"_dep_orig_date",found.origDate);
+  setVal(prefix+"_dep_price",String(found.price));
+  if(prefix==="d2"){
+    S.a.d2_dep_claim="yes"; setRadio("d2_dep_claim","yes");
+    const box=$("#d2depbox"); if(box) box.hidden=false;
+  }
+  const thisBox = $("#"+(prefix==="d2"?"d2depThis":"depThis"));
+  const beforeBox = $("#"+(prefix==="d2"?"d2depBefore":"depBefore"));
+  if(thisBox) thisBox.hidden=true;
+  if(beforeBox) beforeBox.hidden=false;
+  const priorBox = $("#"+(prefix==="d2"?"d2depPriorMethod":"depPriorMethod"));
+  if(priorBox) priorBox.hidden=false;
+  save();
+  refreshDepBox(prefix, prefix==="d2"?{life:RULES.vehicleLifeHeavy.v, limit:0}:undefined, prefix==="d2"?"#depMethodBoxD2":undefined);
+  if(typeof updateTotal==="function") updateTotal();
+}
+function wireCarryForward(prefix){
+  const box = document.querySelector(`[data-carryfwd="${prefix}"]`); if(!box) return;
+  const input = box.querySelector(`[data-carryfwd-file="${prefix}"]`);
+  const status = box.querySelector(`[data-carryfwd-status="${prefix}"]`);
+  input.addEventListener("change", async ()=>{
+    const file = input.files[0]; if(!file) return;
+    let parsed;
+    try{ parsed = JSON.parse(await file.text()); }
+    catch{ status.innerHTML = `<p class="note warn">That file isn't valid JSON — it should be the interaction-record.json from last year's evidence pack.</p>`; return; }
+    const found = extractCarryForward(parsed, prefix);
+    if(found.error){ status.innerHTML = `<p class="note warn">${esc(found.error)}</p>`; return; }
+    status.innerHTML = `<div class="note">
+      <p style="margin:0 0 6px"><b>Found in that file (${esc(String(found.fromYear))}):</b> purchase price ${money(found.price)}, first used for work on ${esc(found.origDate)}, ${found.method==="prime"?"prime cost":"diminishing value"} method.</p>
+      <p class="hint" style="margin:0 0 8px">Only use this if it's the <b>same vehicle</b> you're claiming this year — not if you've since sold it, traded it in, or bought a different one.</p>
+      <button type="button" class="btn small" data-carryfwd-apply>Yes, same vehicle — use these details</button>
+      <button type="button" class="linkbtn" data-carryfwd-dismiss style="margin-left:10px">No, I'll enter it manually</button>
+    </div>`;
+    status.querySelector("[data-carryfwd-apply]").onclick = ()=>{ applyCarryForward(prefix, found); status.innerHTML = `<p class="hint">Applied — check the details below before continuing.</p>`; };
+    status.querySelector("[data-carryfwd-dismiss]").onclick = ()=>{ status.innerHTML=""; input.value=""; };
+  });
+}
+
 const firstErr = (...xs) => xs.find(Boolean) || null;
 
 const STEPS = [
@@ -1236,6 +1316,7 @@ const STEPS = [
         ${field("Do you want to claim depreciation on this vehicle too?", radio("d2_dep_claim",[["yes","Yes"],["no","No"]]), "It isn't a \"car\" for tax purposes, so there's no car limit — the full price can be depreciated over its effective life.", "d2_dep_claim")}
         <div id="d2depbox" ${S.a.d2_dep_claim==="yes"?"":"hidden"}>
           <h3>Depreciation</h3>
+          ${carryForwardBoxHTML("d2")}
           ${field("When did you get this vehicle?", radio("d2_dep_when",[["this","During "+RULES.year],["before","Before then"]]), "", "d2_dep_when")}
           ${field("Purchase price", inp("d2_dep_price","money"), "What you originally paid for it.", "d2_dep_price")}
           <div id="d2depThis" ${(S.a.d2_dep_when||"this")==="before"?"hidden":""}>
@@ -1266,6 +1347,7 @@ const STEPS = [
       <div class="pair">${field("Repairs & maintenance", inp("car_repairs","money"),"", "car_repairs")}${field("Fuel & oil", inp("car_fuel","money"),"", "car_fuel")}</div>
       <div class="pair">${field("Loan interest paid", inp("car_interest","money"),"", "car_interest")}${field("Other (e.g. roadside assistance)", inp("car_other","money"),"", "car_other")}</div>
       <h3>Depreciation</h3>
+      ${carryForwardBoxHTML("car")}
       ${field("When did you get this vehicle?", radio("car_dep_when",[["this","During "+RULES.year],["before","Before then"]]), "", "car_dep_when")}
       ${field("Purchase price", inp("car_dep_price","money"), "What you originally paid for it.", "car_dep_price")}
       <div id="depThis" ${(S.a.car_dep_when||"this")==="before"?"hidden":""}>
@@ -1289,6 +1371,7 @@ const STEPS = [
      document.querySelectorAll('[name=car_class],[name=car_owned]').forEach(r=>r.addEventListener("change",syncClass));
      document.querySelectorAll('[name=car_trips]').forEach(c=>c.addEventListener("change",()=>{ $("#bulkyq").hidden=!document.querySelector('[name=car_trips][value=bulky]').checked; }));
      refreshDepBox("car");
+     wireCarryForward("car");
      const dw=()=>{ const before=(document.querySelector('[name=car_dep_when]:checked')||{}).value==="before"; $("#depThis").hidden=before; $("#depBefore").hidden=!before; refreshDepBox("car"); };
      document.querySelectorAll('[name=car_dep_when]').forEach(r=>r.addEventListener("change",dw));
      document.querySelectorAll('[name=car_dep_claimed_before]').forEach(r=>r.addEventListener("change",()=>{ $("#depPriorMethod").hidden=(document.querySelector('[name=car_dep_claimed_before]:checked')||{}).value!=="yes"; refreshDepBox("car"); }));
@@ -1307,6 +1390,7 @@ const STEPS = [
      ["d2_dep_price","d2_dep_date","d2_dep_orig_date"].forEach(id=>{ const el=$("#f_"+id); if(el){ el.addEventListener("input",()=>refreshDepBox("d2",d2depOpts,"#depMethodBoxD2")); el.addEventListener("change",()=>refreshDepBox("d2",d2depOpts,"#depMethodBoxD2")); } });
      document.querySelectorAll('[name=d2_dep_prior_method]').forEach(r=>r.addEventListener("change",()=>refreshDepBox("d2",d2depOpts,"#depMethodBoxD2")));
      if($("#d2depbox") && !$("#d2depbox").hidden) refreshDepBox("d2",d2depOpts,"#depMethodBoxD2");
+     wireCarryForward("d2");
 
      $("#q").addEventListener("click", e=>{
        if(e.target.closest('[name=car_dep_method]')) setTimeout(()=>refreshDepBox("car"),0);
